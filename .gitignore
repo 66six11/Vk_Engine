@@ -1,0 +1,184 @@
+# ==========================================
+# RenderEngine GitIgnore
+# C++ CMake Project
+# ==========================================
+
+# ------------------------------------------
+# Build Directories
+# ------------------------------------------
+/build/
+/cmake-build-*/
+/out/
+/bin/
+/lib/
+/Debug/
+/Release/
+/RelWithDebInfo/
+/MinSizeRel/
+x64/
+x86/
+arm64/
+
+# ------------------------------------------
+# Visual Studio
+# ------------------------------------------
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+ipch/
+*.aps
+*.ncb
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.pdb
+*.obj
+*.exe
+*.dll
+*.lib
+*.exp
+*.idb
+*.tlog
+*.lastbuildstate
+
+# ------------------------------------------
+# CLion / JetBrains
+# ------------------------------------------
+.idea/
+*.iml
+*.iws
+*.ipr
+.cmake/
+
+# ------------------------------------------
+# CMake
+# ------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+CMakeUserPresets.json
+
+# ------------------------------------------
+# Compiled Object files
+# ------------------------------------------
+*.o
+*.obj
+*.lo
+*.slo
+
+# ------------------------------------------
+# Precompiled Headers
+# ------------------------------------------
+*.gch
+*.pch
+
+# ------------------------------------------
+# Libraries
+# ------------------------------------------
+*.lib
+*.a
+*.la
+*.lo
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# ------------------------------------------
+# Executables
+# ------------------------------------------
+*.exe
+*.out
+*.app
+
+# ------------------------------------------
+# Debug files
+# ------------------------------------------
+*.dSYM/
+*.su
+*.d
+
+# ------------------------------------------
+# Package files
+# ------------------------------------------
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ------------------------------------------
+# Logs and databases
+# ------------------------------------------
+*.log
+*.sql
+*.sqlite
+
+# ------------------------------------------
+# OS generated files
+# ------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------
+# Shader caches
+# ------------------------------------------
+*.spv
+*.dxil
+*.cso
+*.pso.cache
+
+# ------------------------------------------
+# RenderGraph debug exports
+# ------------------------------------------
+*.dot
+*.mermaid
+render_graph_*.html
+render_graph_*.json
+
+# ------------------------------------------
+# Profiling data
+# ------------------------------------------
+*.gtimer
+*.nvprof
+*.rpd
+*.csv
+
+# ------------------------------------------
+# Temporary files
+# ------------------------------------------
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.*.swp
+.*.swo
+
