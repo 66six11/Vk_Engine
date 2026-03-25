@@ -1,0 +1,8 @@
+﻿#pragma once
+#ifndef ENGINE_RESOURCEMANAGER_H
+#define ENGINE_RESOURCEMANAGER_H
+
+
+
+
+#endif //ENGINE_RESOURCEMANAGER_H
