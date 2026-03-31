@@ -12,9 +12,8 @@ namespace engine::rhi::vulkan
     Semaphore::Semaphore(
         VkDevice                         device,
         VkSemaphore                      handle,
-        bool                             isTimeline,
         std::function<void(VkSemaphore)> deleter)
-        : device_(device), handle_(handle), isTimeline_(isTimeline), deleter_(std::move(deleter))
+        : device_(device), handle_(handle), deleter_(std::move(deleter))
     {
         assert(device_ != VK_NULL_HANDLE);
         assert(handle_ != VK_NULL_HANDLE);
@@ -30,12 +29,10 @@ namespace engine::rhi::vulkan
     Semaphore::Semaphore(Semaphore&& other) noexcept
         : device_(other.device_),
           handle_(other.handle_),
-          isTimeline_(other.isTimeline_),
           deleter_(std::move(other.deleter_))
     {
-        other.device_     = VK_NULL_HANDLE;
-        other.handle_     = VK_NULL_HANDLE;
-        other.isTimeline_ = false;
+        other.device_ = VK_NULL_HANDLE;
+        other.handle_ = VK_NULL_HANDLE;
     }
 
     Semaphore& Semaphore::operator=(Semaphore&& other) noexcept
@@ -44,56 +41,14 @@ namespace engine::rhi::vulkan
         {
             Destroy();
 
-            device_     = other.device_;
-            handle_     = other.handle_;
-            isTimeline_ = other.isTimeline_;
-            deleter_    = std::move(other.deleter_);
+            device_ = other.device_;
+            handle_ = other.handle_;
+            deleter_ = std::move(other.deleter_);
 
-            other.device_     = VK_NULL_HANDLE;
-            other.handle_     = VK_NULL_HANDLE;
-            other.isTimeline_ = false;
+            other.device_ = VK_NULL_HANDLE;
+            other.handle_ = VK_NULL_HANDLE;
         }
         return *this;
-    }
-
-    // ==================== 时间线信号量接口 ====================
-
-    uint64_t Semaphore::GetCounterValue() const
-    {
-        if (!isTimeline_ || handle_ == VK_NULL_HANDLE)
-            return 0;
-
-        uint64_t value = 0;
-        vkGetSemaphoreCounterValue(device_, handle_, &value);
-        return value;
-    }
-
-    void Semaphore::Signal(uint64_t value) const
-    {
-        if (!isTimeline_ || handle_ == VK_NULL_HANDLE)
-            return;
-
-        VkSemaphoreSignalInfo signalInfo = {};
-        signalInfo.sType                 = VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO;
-        signalInfo.semaphore             = handle_;
-        signalInfo.value                 = value;
-
-        vkSignalSemaphore(device_, &signalInfo);
-    }
-
-    void Semaphore::Wait(uint64_t value, uint64_t timeoutNs) const
-    {
-        if (!isTimeline_ || handle_ == VK_NULL_HANDLE)
-            return;
-
-        VkSemaphoreWaitInfo waitInfo = {};
-        waitInfo.sType               = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
-        waitInfo.flags               = 0;
-        waitInfo.semaphoreCount      = 1;
-        waitInfo.pSemaphores         = &handle_;
-        waitInfo.pValues             = &value;
-
-        vkWaitSemaphores(device_, &waitInfo, timeoutNs);
     }
 
     // ==================== 内部方法 ====================
@@ -103,7 +58,6 @@ namespace engine::rhi::vulkan
         VkSemaphore releasedHandle = handle_;
         handle_                    = VK_NULL_HANDLE;
         device_                    = VK_NULL_HANDLE;
-        isTimeline_                = false;
         deleter_                   = nullptr;
         return releasedHandle;
     }
@@ -114,10 +68,9 @@ namespace engine::rhi::vulkan
         {
             deleter_(handle_);
         }
-        handle_     = VK_NULL_HANDLE;
-        device_     = VK_NULL_HANDLE;
-        isTimeline_ = false;
-        deleter_    = nullptr;
+        handle_  = VK_NULL_HANDLE;
+        device_  = VK_NULL_HANDLE;
+        deleter_ = nullptr;
     }
 
 } // namespace engine::rhi::vulkan

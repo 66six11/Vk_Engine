@@ -6,9 +6,11 @@
 #define ENGINE_DEVICEMANAGER_H
 
 #include <vma/vk_mem_alloc.h>
+#include <vector>
 
 #include "vulkan/vulkan.h"
 #include "vulkan/DeviceCapabilities.h"
+#include "vulkan/Command/CommandQueue.h"
 
 namespace engine::rhi::vulkan
 {
@@ -95,9 +97,24 @@ namespace engine::rhi::vulkan
             // ==================== 设备能力访问 ====================
 
             // 获取完整的设备能力信息
-            const DeviceCapabilities& GetCapabilities() const { return capabilities_; }
+            const GpuDeviceCaps& GetCapabilities() const { return capabilities_; }
 
             // 便捷方法：检查特定功能支持
+
+            // ==================== 队列访问 ====================
+
+            // 创建图形队列包装器
+            CommandQueue CreateGraphicsQueue() const { return CommandQueue(graphicsQueue_, queueFamilyIndices_.graphicsFamily, 0); }
+
+            // 创建计算队列包装器
+            CommandQueue CreateComputeQueue() const { return CommandQueue(computeQueue_, queueFamilyIndices_.computeFamily, 0); }
+
+            // 创建传输队列包装器
+            CommandQueue CreateTransferQueue() const { return CommandQueue(transferQueue_, queueFamilyIndices_.transferFamily, 0); }
+
+            // 等待图形队列空闲（便捷方法）
+            void WaitGraphicsQueueIdle() const;
+            // 检查设备支持的功能
             bool SupportsTimelineSemaphore() const { return capabilities_.timelineSemaphore; }
             bool SupportsDynamicRendering() const { return capabilities_.dynamicRendering; }
             bool SupportsBufferDeviceAddress() const { return capabilities_.bufferDeviceAddress; }
@@ -115,12 +132,12 @@ namespace engine::rhi::vulkan
             void CreateLogicalDevice();
             void CreateVMA();
 
-            void               QueryDeviceCapabilities();
+            void               QueryGpuDeviceCaps();
             QueueFamilyIndices FindQueueFamilies();
-            int                RateDevice(VkPhysicalDevice device);
+            static int                RateDevice(VkPhysicalDevice device);
 
         private:
-            DeviceCapabilities capabilities_;
+            GpuDeviceCaps capabilities_;
     };
 } // namespace engine::rhi::vulkan
 

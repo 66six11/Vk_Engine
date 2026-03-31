@@ -11,6 +11,7 @@
 #include "vulkan/Synchronization/FencePool.h"
 #include "vulkan/Synchronization/Semaphore.h"
 #include "vulkan/Synchronization/SemaphorePool.h"
+#include "vulkan/Synchronization/TimelineSemaphore.h"
 #include "vulkan/Synchronization/SyncConfig.h"
 
 #include <memory>
@@ -41,17 +42,17 @@ namespace engine::rhi::vulkan
             // 配置（必须在 Initialize 前设置）
             void SetFenceConfig(const FencePoolConfig& config) { fenceConfig_ = config; }
             void SetBinarySemaphoreConfig(const SemaphorePoolConfig& config) { binarySemaphoreConfig_ = config; }
-            void SetTimelineSemaphoreConfig(const SemaphorePoolConfig& config) { timelineSemaphoreConfig_ = config; }
 
             // 获取各类池
             FencePool&     GetFencePool() { return *fencePool_; }
             SemaphorePool& GetBinarySemaphorePool() { return *binarySemaphorePool_; }
-            SemaphorePool& GetTimelineSemaphorePool() { return *timelineSemaphorePool_; }
 
             // 便捷方法：直接获取同步对象
             Fence     AcquireFence() { return fencePool_->Acquire(); }
             Semaphore AcquireBinarySemaphore() { return binarySemaphorePool_->Acquire(); }
-            Semaphore AcquireTimelineSemaphore() { return timelineSemaphorePool_->Acquire(); }
+
+            // Timeline Semaphore 管理（长期持有，不池化）
+            TimelineSemaphore CreateTimelineSemaphore(uint64_t initialValue = 0);
 
             // 批量获取
             std::vector<Fence>     AcquireFences(uint32_t count);
@@ -69,11 +70,9 @@ namespace engine::rhi::vulkan
 
             std::unique_ptr<FencePool>     fencePool_;
             std::unique_ptr<SemaphorePool> binarySemaphorePool_;
-            std::unique_ptr<SemaphorePool> timelineSemaphorePool_;
 
             FencePoolConfig     fenceConfig_;
             SemaphorePoolConfig binarySemaphoreConfig_;
-            SemaphorePoolConfig timelineSemaphoreConfig_;
 
             bool initialized_       = false;
             bool timelineSupported_ = false;

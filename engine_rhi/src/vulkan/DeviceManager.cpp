@@ -17,6 +17,10 @@
 #include <cstring>
 
 #include "vulkan/VulkanUtils.h"
+#include "vulkan/Command/CommandBuffer.h"
+#include "vulkan/Synchronization/Fence.h"
+#include "vulkan/Synchronization/Semaphore.h"
+#include "vulkan/SwapChainManager.h"
 
 namespace engine::rhi::vulkan
 {
@@ -60,7 +64,7 @@ namespace engine::rhi::vulkan
         CreatePhysicalDevice();
 
         // 查询设备能力（在创建设备前）
-        QueryDeviceCapabilities();
+        QueryGpuDeviceCaps();
 
         CreateLogicalDevice();
 
@@ -227,7 +231,7 @@ namespace engine::rhi::vulkan
 
     // ==================== 设备能力查询 ====================
 
-    void DeviceManager::QueryDeviceCapabilities()
+    void DeviceManager::QueryGpuDeviceCaps()
     {
         // 获取物理设备属性
         VkPhysicalDeviceProperties properties;
@@ -517,4 +521,15 @@ namespace engine::rhi::vulkan
 
         VK_CHECK(vmaCreateAllocator(&allocatorInfo, &vmaAllocator_));
     }
+
+    // ==================== 队列等待 ====================
+
+    void DeviceManager::WaitGraphicsQueueIdle() const
+    {
+        if (graphicsQueue_ != VK_NULL_HANDLE)
+        {
+            vkQueueWaitIdle(graphicsQueue_);
+        }
+    }
+
 } // namespace engine::rhi::vulkan

@@ -49,21 +49,6 @@ namespace engine::rhi::vulkan
             return false;
         }
 
-        // 创建时间线信号量池（如果支持）
-        if (timelineSupported_)
-        {
-            // 设置时间线信号量配置
-            timelineSemaphoreConfig_.timeline = true;
-
-            timelineSemaphorePool_ = std::make_unique<SemaphorePool>(deviceManager_);
-            if (!timelineSemaphorePool_->Initialize(timelineSemaphoreConfig_))
-            {
-                // 时间线信号量池创建失败不是致命错误，降级处理
-                timelineSemaphorePool_.reset();
-                timelineSupported_ = false;
-            }
-        }
-
         initialized_ = true;
         return true;
     }
@@ -84,12 +69,6 @@ namespace engine::rhi::vulkan
         {
             binarySemaphorePool_->Shutdown();
             binarySemaphorePool_.reset();
-        }
-
-        if (timelineSemaphorePool_)
-        {
-            timelineSemaphorePool_->Shutdown();
-            timelineSemaphorePool_.reset();
         }
 
         initialized_       = false;
@@ -134,6 +113,33 @@ namespace engine::rhi::vulkan
         }
 
         return semaphores;
+    }
+
+    // ==================== Timeline Semaphore ====================
+
+    TimelineSemaphore SynchronizationManager::CreateTimelineSemaphore(uint64_t initialValue)
+    {
+        if (!timelineSupported_)
+            return TimelineSemaphore();
+
+        VkDevice device = deviceManager_.GetLogicalDevice();
+
+        VkSemaphoreTypeCreateInfo timelineInfo = {};
+        timelineInfo.sType         = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+        timelineInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
+        timelineInfo.initialValue  = initialValue;
+
+        VkSemaphoreCreateInfo semaphoreInfo = {};
+        semaphoreInfo.sType                 = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        semaphoreInfo.pNext                 = &timelineInfo;
+
+        VkSemaphore handle = VK_NULL_HANDLE;
+        VkResult result    = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &handle);
+
+        if (result != VK_SUCCESS)
+            return TimelineSemaphore();
+
+        return TimelineSemaphore(device, handle);
     }
 
 } // namespace engine::rhi::vulkan

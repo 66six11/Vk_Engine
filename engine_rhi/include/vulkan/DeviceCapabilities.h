@@ -13,7 +13,7 @@ namespace engine::rhi::vulkan
 {
     // ==================== 设备能力结构 ====================
 
-    struct DeviceCapabilities
+    struct GpuDeviceCaps
     {
         // ===== Vulkan 核心版本特性 =====
 
@@ -90,7 +90,7 @@ namespace engine::rhi::vulkan
         bool requireRayTracing             = false;
 
         // 检查请求的特性和设备能力是否匹配
-        bool IsCompatible(const DeviceCapabilities& caps) const
+        bool IsCompatible(const GpuDeviceCaps& caps) const
         {
             if (requireTimelineSemaphore && !caps.timelineSemaphore)
                 return false;

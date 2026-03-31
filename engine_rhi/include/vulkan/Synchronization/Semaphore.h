@@ -1,7 +1,7 @@
 //
 // Created by C66 on 2026/3/29.
 //
-// Semaphore RAII 包装类
+// 二进制 Semaphore RAII 包装类
 //
 #pragma once
 
@@ -10,7 +10,7 @@
 
 namespace engine::rhi::vulkan
 {
-    // Semaphore 包装类
+    // 二进制 Semaphore 包装类
     class Semaphore
     {
         public:
@@ -18,7 +18,6 @@ namespace engine::rhi::vulkan
             Semaphore(
                 VkDevice                         device,
                 VkSemaphore                      handle,
-                bool                             isTimeline,
                 std::function<void(VkSemaphore)> deleter);
             ~Semaphore();
 
@@ -30,14 +29,8 @@ namespace engine::rhi::vulkan
             Semaphore(Semaphore&& other) noexcept;
             Semaphore& operator=(Semaphore&& other) noexcept;
 
-            // 时间线信号量特有接口
-            uint64_t GetCounterValue() const;
-            void     Signal(uint64_t value) const;
-            void     Wait(uint64_t value, uint64_t timeoutNs = UINT64_MAX) const;
-
             // 访问器
             VkSemaphore GetHandle() const { return handle_; }
-            bool        IsTimeline() const { return isTimeline_; }
             explicit    operator bool() const { return handle_ != VK_NULL_HANDLE; }
 
             VkSemaphore Release();
@@ -45,9 +38,8 @@ namespace engine::rhi::vulkan
         private:
             void Destroy();
 
-            VkDevice                         device_     = VK_NULL_HANDLE;
-            VkSemaphore                      handle_     = VK_NULL_HANDLE;
-            bool                             isTimeline_ = false;
+            VkDevice                         device_ = VK_NULL_HANDLE;
+            VkSemaphore                      handle_ = VK_NULL_HANDLE;
             std::function<void(VkSemaphore)> deleter_;
     };
 } // namespace engine::rhi::vulkan

@@ -76,6 +76,8 @@ namespace engine::rhi::vulkan
     {
         VkDevice device = deviceManager_.GetLogicalDevice();
 
+        std::lock_guard<std::mutex> lock(mutex_);
+
         // 如果有可用的，直接返回
         if (!availableSemaphores_.empty())
         {
@@ -86,7 +88,7 @@ namespace engine::rhi::vulkan
             // 创建归还回调
             auto deleter = [this](VkSemaphore s) { this->Release(s); };
 
-            return Semaphore(device, semaphore, config_.timeline, deleter);
+            return Semaphore(device, semaphore, deleter);
         }
 
         // 没有可用的，检查是否可以创建新的
@@ -99,7 +101,7 @@ namespace engine::rhi::vulkan
                 activeCount_++;
 
                 auto deleter = [this](VkSemaphore s) { this->Release(s); };
-                return Semaphore(device, semaphore, config_.timeline, deleter);
+                return Semaphore(device, semaphore, deleter);
             }
         }
 
@@ -112,6 +114,8 @@ namespace engine::rhi::vulkan
         if (semaphore == VK_NULL_HANDLE)
             return;
 
+        std::lock_guard<std::mutex> lock(mutex_);
+
         availableSemaphores_.push_back(semaphore);
         activeCount_--;
     }
@@ -122,17 +126,6 @@ namespace engine::rhi::vulkan
     {
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType                 = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-        // 时间线信号量需要额外的结构体
-        VkSemaphoreTypeCreateInfo timelineInfo = {};
-        if (config_.timeline)
-        {
-            timelineInfo.sType         = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
-            timelineInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
-            timelineInfo.initialValue  = 0;
-
-            semaphoreInfo.pNext = &timelineInfo;
-        }
 
         VkResult result =
             vkCreateSemaphore(deviceManager_.GetLogicalDevice(), &semaphoreInfo, nullptr, &outSemaphore);
