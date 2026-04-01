@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef ENGINE_VULKAN_SHADER_H
 #define ENGINE_VULKAN_SHADER_H
 

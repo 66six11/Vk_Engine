@@ -444,13 +444,19 @@ namespace engine::rhi::vulkan
             ppNext                                          = &bufferDeviceAddressFeatures.pNext;
         }
 
-        // 启用描述符索引
+        // 启用描述符索引（Bindless必需的所有特性）
         if (capabilities_.descriptorIndexing)
         {
-            descriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
-            descriptorIndexingFeatures.runtimeDescriptorArray          = VK_TRUE;
-            *ppNext                                                    = &descriptorIndexingFeatures;
-            ppNext                                                     = &descriptorIndexingFeatures.pNext;
+            descriptorIndexingFeatures.descriptorBindingPartiallyBound              = VK_TRUE;
+            descriptorIndexingFeatures.runtimeDescriptorArray                       = VK_TRUE;
+            // Bindless描述符更新必需
+            descriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+            descriptorIndexingFeatures.descriptorBindingStorageImageUpdateAfterBind = VK_TRUE;
+            descriptorIndexingFeatures.descriptorBindingUniformBufferUpdateAfterBind= VK_TRUE;
+            descriptorIndexingFeatures.descriptorBindingStorageBufferUpdateAfterBind= VK_TRUE;
+            descriptorIndexingFeatures.descriptorBindingUpdateUnusedWhilePending    = VK_TRUE;
+            *ppNext                                                                 = &descriptorIndexingFeatures;
+            ppNext                                                                  = &descriptorIndexingFeatures.pNext;
         }
 
         // 启用同步2

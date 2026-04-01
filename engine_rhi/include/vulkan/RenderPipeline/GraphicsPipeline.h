@@ -119,10 +119,10 @@ struct DynamicStateConfig {
     DynamicStateFlag flags = DynamicStateFlag::Viewport | DynamicStateFlag::Scissor;
     
     // 默认构造函数
-    DynamicStateConfig() = default;
+    constexpr DynamicStateConfig() = default;
     
-    // 从DynamicStateFlag隐式转换（支持直接赋值）
-    DynamicStateConfig(DynamicStateFlag f) : flags(f) {}
+    // 从DynamicStateFlag隐式转换（支持直接赋值和默认初始化）
+    constexpr DynamicStateConfig(DynamicStateFlag f) : flags(f) {}
     
     // 赋值操作符
     DynamicStateConfig& operator=(DynamicStateFlag f) {
@@ -151,10 +151,18 @@ struct RenderingTargetFormats {
     VkFormat stencilFormat = VK_FORMAT_UNDEFINED;
 };
 
+// Pipeline Shader Stage - 直接存储Vulkan对象（上层负责提供）
+struct PipelineShaderStage {
+    VkShaderModule module = VK_NULL_HANDLE;
+    VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT;
+    const char* entryPoint = "main";
+};
+
 // 图形管线描述 - 强制 Dynamic Rendering，无传统 RenderPass
+// 注意：shaders字段直接存储VkShaderModule，上层负责从ShaderManager获取
 struct GraphicsPipelineDesc {
-    // Shader
-    std::vector<VulkanShaderHandle> shaders;  // VS, FS, etc.
+    // Shader Stages - 直接存储Vulkan对象
+    std::vector<PipelineShaderStage> shaders;
     
     // 固定功能状态
     VertexInputState vertexInput;
@@ -166,8 +174,8 @@ struct GraphicsPipelineDesc {
     ColorBlendState colorBlend;
     DynamicStateConfig dynamicState = DynamicStateFlag::Viewport | DynamicStateFlag::Scissor;
     
-    // Pipeline Layout
-    VulkanPipelineLayoutHandle layout;
+    // Pipeline Layout - 直接存储Vulkan对象（上层提供）
+    VkPipelineLayout layout = VK_NULL_HANDLE;
     
     // 渲染目标格式 - Dynamic Rendering 必需
     RenderingTargetFormats renderTargets;

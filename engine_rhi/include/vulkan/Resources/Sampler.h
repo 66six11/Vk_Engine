@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef ENGINE_VULKAN_SAMPLER_H
 #define ENGINE_VULKAN_SAMPLER_H
 
@@ -26,13 +26,50 @@ namespace engine::rhi::vulkan
         VkBool32             unnormalizedCoordinates = VK_FALSE; // 通常false
         const char*          debugName               = nullptr;
 
-        // 预设工厂方法（实现在cpp中）
-        [[nodiscard]] static SamplerDesc LinearWrap();
-        [[nodiscard]] static SamplerDesc LinearClamp();
-        [[nodiscard]] static SamplerDesc NearestWrap();
-        [[nodiscard]] static SamplerDesc NearestClamp();
-        [[nodiscard]] static SamplerDesc Anisotropic(float maxAniso = 16.0f);
-        [[nodiscard]] static SamplerDesc ShadowPCF(); // 阴影比较采样
+        // 预设工厂方法（inline实现）
+        [[nodiscard]] static SamplerDesc LinearWrap() {
+            SamplerDesc desc;
+            desc.magFilter = VK_FILTER_LINEAR;
+            desc.minFilter = VK_FILTER_LINEAR;
+            desc.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+            desc.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            desc.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            desc.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            return desc;
+        }
+        
+        [[nodiscard]] static SamplerDesc LinearClamp() {
+            SamplerDesc desc;
+            desc.magFilter = VK_FILTER_LINEAR;
+            desc.minFilter = VK_FILTER_LINEAR;
+            desc.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+            desc.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            desc.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            desc.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            return desc;
+        }
+        
+        [[nodiscard]] static SamplerDesc NearestWrap() {
+            SamplerDesc desc;
+            desc.magFilter = VK_FILTER_NEAREST;
+            desc.minFilter = VK_FILTER_NEAREST;
+            desc.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+            desc.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            desc.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            desc.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            return desc;
+        }
+        
+        [[nodiscard]] static SamplerDesc NearestClamp() {
+            SamplerDesc desc;
+            desc.magFilter = VK_FILTER_NEAREST;
+            desc.minFilter = VK_FILTER_NEAREST;
+            desc.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+            desc.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            desc.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            desc.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            return desc;
+        }
     };
 
     struct Sampler

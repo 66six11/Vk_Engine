@@ -86,6 +86,9 @@ namespace engine::rhi::vulkan
             // 获取PipelineLayout（单Set的便捷封装）
             [[nodiscard]] VkPipelineLayout getPipelineLayout() const { return m_pipelineLayout; }
 
+            // 获取DescriptorPool（用于分配额外的DescriptorSet）
+            [[nodiscard]] VkDescriptorPool GetDescriptorPool() const { return m_pool; }
+
             // === 统计 ===
 
             [[nodiscard]] uint32_t      getTextureCount() const { return m_textureCount; }
