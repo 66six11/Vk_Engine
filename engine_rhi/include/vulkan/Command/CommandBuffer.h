@@ -5,6 +5,13 @@
 // 职责：生命周期管理（自动归还到 Pool），Begin/End 录制
 // 注意：不封装具体 vkCmd* 命令，保持 Thin Wrapper
 //
+//
+// Created by C66 on 2026/3/31.
+//
+// CommandBuffer - Vulkan CommandBuffer 轻量级 RAII 包装
+// 职责：生命周期管理（自动归还到 Pool），Begin/End 录制
+// 注意：不封装具体 vkCmd* 命令，保持 Thin Wrapper
+//
 #pragma once
 
 #include <vulkan/vulkan.h>

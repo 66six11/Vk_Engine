@@ -85,12 +85,57 @@ struct ColorBlendState {
     float blendConstants[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 };
 
-// 动态状态
-struct DynamicState {
-    std::vector<VkDynamicState> dynamicStates = {
-        VK_DYNAMIC_STATE_VIEWPORT,
-        VK_DYNAMIC_STATE_SCISSOR
-    };
+// 动态状态标志（Vulkan 1.3支持更多动态状态）
+enum class DynamicStateFlag : uint32_t {
+    None = 0,
+    Viewport = 1 << 0,           // VK_DYNAMIC_STATE_VIEWPORT
+    Scissor = 1 << 1,            // VK_DYNAMIC_STATE_SCISSOR
+    LineWidth = 1 << 2,          // VK_DYNAMIC_STATE_LINE_WIDTH
+    DepthBias = 1 << 3,          // VK_DYNAMIC_STATE_DEPTH_BIAS
+    BlendConstants = 1 << 4,     // VK_DYNAMIC_STATE_BLEND_CONSTANTS
+    DepthBounds = 1 << 5,        // VK_DYNAMIC_STATE_DEPTH_BOUNDS
+    StencilCompareMask = 1 << 6, // VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK
+    StencilWriteMask = 1 << 7,   // VK_DYNAMIC_STATE_STENCIL_WRITE_MASK
+    StencilReference = 1 << 8,   // VK_DYNAMIC_STATE_STENCIL_REFERENCE
+    // Vulkan 1.3+ 扩展动态状态
+    CullMode = 1 << 9,           // VK_DYNAMIC_STATE_CULL_MODE
+    FrontFace = 1 << 10,         // VK_DYNAMIC_STATE_FRONT_FACE
+    PrimitiveTopology = 1 << 11, // VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY
+    ViewportWithCount = 1 << 12, // VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT
+    ScissorWithCount = 1 << 13,  // VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT
+    All = 0xFFFFFFFF
+};
+
+constexpr DynamicStateFlag operator|(DynamicStateFlag a, DynamicStateFlag b) {
+    return static_cast<DynamicStateFlag>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+}
+
+constexpr bool hasFlag(DynamicStateFlag flags, DynamicStateFlag flag) {
+    return (static_cast<uint32_t>(flags) & static_cast<uint32_t>(flag)) != 0;
+}
+
+// 动态状态配置
+struct DynamicStateConfig {
+    DynamicStateFlag flags = DynamicStateFlag::Viewport | DynamicStateFlag::Scissor;
+    
+    // 默认构造函数
+    DynamicStateConfig() = default;
+    
+    // 从DynamicStateFlag隐式转换（支持直接赋值）
+    DynamicStateConfig(DynamicStateFlag f) : flags(f) {}
+    
+    // 赋值操作符
+    DynamicStateConfig& operator=(DynamicStateFlag f) {
+        flags = f;
+        return *this;
+    }
+    
+    [[nodiscard]] bool has(DynamicStateFlag flag) const {
+        return hasFlag(flags, flag);
+    }
+    
+    // 转换为VkDynamicState数组（Pipeline创建用）
+    [[nodiscard]] std::vector<VkDynamicState> toVkStates() const;
 };
 
 // 视口状态（如果用动态状态，这里只是占位）
@@ -119,8 +164,7 @@ struct GraphicsPipelineDesc {
     MultisampleState multisample;
     DepthStencilState depthStencil;
     ColorBlendState colorBlend;
-    DynamicState dynamic;
-    // ViewportState 移除 - 强制使用动态 viewport/scissor
+    DynamicStateConfig dynamicState = DynamicStateFlag::Viewport | DynamicStateFlag::Scissor;
     
     // Pipeline Layout
     VulkanPipelineLayoutHandle layout;

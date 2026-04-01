@@ -80,11 +80,11 @@ namespace engine::rhi::vulkan
         // 必需的最低 Vulkan API 版本 - 强制 Vulkan 1.3 (Dynamic Rendering)
         uint32_t minApiVersion = VK_API_VERSION_1_3;
 
-        // 请求启用的特性 - Dynamic Rendering 强制启用
+        // 请求启用的特性 - Bindless架构强制要求
         bool requireTimelineSemaphore      = true;   // 推荐启用
         bool requireDynamicRendering       = true;   // 强制要求
-        bool requireBufferDeviceAddress    = false;  // 可选
-        bool requireDescriptorIndexing     = false;  // 可选 (bindless)
+        bool requireBufferDeviceAddress    = true;   // 强制要求 (bindless必需)
+        bool requireDescriptorIndexing     = true;   // 强制要求 (bindless必需)
         bool requireSynchronization2       = true;   // 推荐启用
         bool requireMeshShader             = false;  // 可选
         bool requireRayTracing             = false;  // 可选
