@@ -77,17 +77,17 @@ namespace engine::rhi::vulkan
     // 用于创建设备时请求启用哪些特性
     struct FeatureRequirements
     {
-        // 必需的最低 Vulkan API 版本
-        uint32_t minApiVersion = VK_API_VERSION_1_2;
+        // 必需的最低 Vulkan API 版本 - 强制 Vulkan 1.3 (Dynamic Rendering)
+        uint32_t minApiVersion = VK_API_VERSION_1_3;
 
-        // 请求启用的特性
-        bool requireTimelineSemaphore      = false;
-        bool requireDynamicRendering       = false;
-        bool requireBufferDeviceAddress    = false;
-        bool requireDescriptorIndexing     = false;
-        bool requireSynchronization2       = false;
-        bool requireMeshShader             = false;
-        bool requireRayTracing             = false;
+        // 请求启用的特性 - Dynamic Rendering 强制启用
+        bool requireTimelineSemaphore      = true;   // 推荐启用
+        bool requireDynamicRendering       = true;   // 强制要求
+        bool requireBufferDeviceAddress    = false;  // 可选
+        bool requireDescriptorIndexing     = false;  // 可选 (bindless)
+        bool requireSynchronization2       = true;   // 推荐启用
+        bool requireMeshShader             = false;  // 可选
+        bool requireRayTracing             = false;  // 可选
 
         // 检查请求的特性和设备能力是否匹配
         bool IsCompatible(const GpuDeviceCaps& caps) const
